@@ -56,7 +56,7 @@ Requirements:
 - Dart >= 2.17
 
 Steps:
-1. git clone https://github.com/yourusername/product_catalog_app.git
+1. git clone https://github.com/Uday-bonhq/product_catelog_app.git
 2. cd product_catalog_app
 3. flutter pub get
 4. flutter run
@@ -72,7 +72,7 @@ Using GetX for:
 - Dependency Injection
 - Theme Management
 - State Updates
-- Routing
+- Offline data save and retrieve
 
 Example:
 Get.put(ProductController());
@@ -107,11 +107,11 @@ ASSUMPTIONS
 UI/UX NOTES
 ------------------------------
 
-- Cupertino-style switch with light/dark icons
-- Ripple reveal animation when toggling theme
 - Shimmer placeholders with skeletonizer
 - Cached images with cached_network_image
 - Responsive design
+- Cupertino-style switch with light/dark icons
+- Ripple reveal animation when toggling theme
 
 ------------------------------
 PACKAGES USED
@@ -131,11 +131,6 @@ cached_network_image - Efficient image caching
 flutter_staggered_animations - List animations
 toast                - Simple toast messages
 
-------------------------------
-CI/CD
-------------------------------
-
-- GitHub Actions scaffolded for PR test runs and future builds
 
 ------------------------------
 LICENSE
@@ -147,5 +142,5 @@ MIT License. Free to use and contribute.
 AUTHOR
 ------------------------------
 
-Created by: [Your Name]
-GitHub: https://github.com/yourusername
+Created by: UDAY SINGH
+GitHub: https://github.com/udaysingh7737

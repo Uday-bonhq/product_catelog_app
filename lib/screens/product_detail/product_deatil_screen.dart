@@ -195,9 +195,21 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 )),
                 const SizedBox(height: 20),
 
-                ElevatedButton(
-                  onPressed: () => showRatingBottomSheet(context),
-                  child: const Text('Rate Now'),
+                GestureDetector(
+                  onTap: () {
+                    showRatingBottomSheet(context);
+                  },
+                  child: Container(
+                      width: Get.width,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        // border: Border.all(color: AppColors.lightBackground, width: 1.5),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child:  const Center(child: Text('Submit Review',style: TextStyle(
+                        fontSize: 14,fontWeight: FontWeight.bold,
+                        color: Colors.white,),))),
                 ),
                 const SizedBox(height: 50),
               ],

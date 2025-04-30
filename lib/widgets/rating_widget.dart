@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:product_catelog_app/core/theme/app_color.dart';
 
 
 void showRatingBottomSheet(BuildContext context) {
@@ -8,6 +9,7 @@ void showRatingBottomSheet(BuildContext context) {
 
   Get.bottomSheet(
     Container(
+      width: Get.width,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
@@ -33,14 +35,23 @@ void showRatingBottomSheet(BuildContext context) {
             },
           ),
           const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
+          GestureDetector(
+            onTap: () {
               // Save or send the rating
               print("Rated: $selectedRating stars");
               Get.back(); // Close bottom sheet
             },
-            child: const Text('Submit'),
+            child: Container(
+              width: 120,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.primary, width: 1.5),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child:  const Center(child: Text('Submit',style: TextStyle(color:AppColors.primary,),))),
           ),
+
+          const SizedBox(height: 20),
         ],
       ),
     ),
@@ -78,7 +89,7 @@ class RatingStars extends StatelessWidget {
               ? () => onRatingChanged!(index + 1)
               : null,
           padding: EdgeInsets.zero,
-          constraints: BoxConstraints(),
+          constraints: const BoxConstraints(),
         );
       }),
     );
