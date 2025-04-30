@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:product_catelog_app/data/cart_item.dart';
 import 'package:product_catelog_app/data/cart_item_cache.dart';
+import 'package:product_catelog_app/domain/cart_item.dart';
 
 class CartController extends GetxController {
   RxList<CartItem> cartItems = <CartItem>[].obs;
@@ -42,6 +42,12 @@ class CartController extends GetxController {
     removeFromCart(item.id);       // Remove old entry
     addToCart(item);               // Add updated entry
     await CartCache.addToCart(item); // Sync with Hive
+  }
+
+
+  RxDouble cartTotal = 0.0.obs;
+  getCartTotalValue(List<CartItem> cartItems) {
+    cartTotal.value = cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
   }
 
 }

@@ -16,10 +16,14 @@ class CartItem {
   @HiveField(3)
   int quantity; // Quantity added to cart
 
+  @HiveField(4)
+  String? thumbnail; // Quantity added to cart
+
   CartItem({
     required this.id,
     required this.title,
     required this.price,
     this.quantity = 1,
+    this.thumbnail,
   });
 }

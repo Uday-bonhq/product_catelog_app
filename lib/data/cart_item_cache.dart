@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'cart_item.dart';
+import 'package:product_catelog_app/domain/cart_item.dart';
 
 class CartCache {
   static const String _boxName = 'cartBox';
@@ -12,7 +12,7 @@ class CartCache {
   }
 
   // Add item to cart (offline)
-  static Future<void> addToCart(CartItem cartItem) async {
+  static Future<void> addToCart1(CartItem cartItem) async {
     final box = await Hive.openBox<CartItem>(_boxName);
     var existingItem = box.values.firstWhere(
           (item) => item.id == cartItem.id,
@@ -21,6 +21,25 @@ class CartCache {
     existingItem.quantity += cartItem.quantity;
     await box.put(cartItem.id, existingItem);
   }
+
+  static Future<void> addToCart(CartItem cartItem) async {
+    final box = await Hive.openBox<CartItem>(_boxName);
+
+    if (box.containsKey(cartItem.id)) {
+      final existingItem = box.get(cartItem.id)!;
+      final updatedItem = CartItem(
+        id: existingItem.id,
+        title: existingItem.title,
+        price: existingItem.price,
+        thumbnail: existingItem.thumbnail,
+        quantity: cartItem.quantity,
+      );
+      await box.put(cartItem.id, updatedItem);
+    } else {
+      await box.put(cartItem.id, cartItem);
+    }
+  }
+
 
   // Get all cart items (offline)
   static Future<List<CartItem>> getCartItems() async {

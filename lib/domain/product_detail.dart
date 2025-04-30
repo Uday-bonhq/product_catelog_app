@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:product_catelog_app/data/product.dart';
+import 'package:product_catelog_app/domain/product.dart';
 
 part 'product_detail.g.dart';
 

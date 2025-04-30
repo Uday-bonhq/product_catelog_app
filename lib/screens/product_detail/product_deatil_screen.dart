@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:product_catelog_app/controller/cart_item_controller.dart';
 import 'package:product_catelog_app/controller/product_detail_controller.dart';
-import 'package:product_catelog_app/core/utils.dart';
-import 'package:product_catelog_app/data/cart_item.dart';
+import 'package:product_catelog_app/core/theme/app_color.dart';
+import 'package:product_catelog_app/core/utils/utils.dart';
 import 'package:product_catelog_app/data/cart_item_cache.dart';
-import 'package:product_catelog_app/data/product_detail.dart';
+import 'package:product_catelog_app/domain/cart_item.dart';
+import 'package:product_catelog_app/domain/product_detail.dart';
+import 'package:product_catelog_app/screens/cart/cart_screen.dart';
 import 'package:product_catelog_app/widgets/carousel_image_slider.dart';
 import 'package:product_catelog_app/widgets/quantity_btn_widget.dart';
+import 'package:product_catelog_app/widgets/rating_widget.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+
 
 class ProductDetailPage extends StatefulWidget {
   final int productId;
@@ -40,45 +44,50 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         scrolledUnderElevation: 0,
         actions: [
 
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined),
-                onPressed: () {
+          GestureDetector(
+            onTap: () {
+              buildGetPage(const CartScreen());
+            },
+            child: Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.shopping_cart_outlined),
+                  onPressed: () {
+                    buildGetPage(const CartScreen());
+                  },
+                ),
 
-                },
-              ),
-
-              Obx(() {
-                return Visibility(
-                  visible: cartController.cartItems.isNotEmpty,
-                  child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle
-                      ),
-                      child: Text(
-                        (cartController.cartItems.length).toString(),
-                        style: TextStyle(color: Colors.white,
-                            fontSize: cartController.cartItems.length > 9
-                                ? 10
-                                : 14
+                Obx(() {
+                  return Visibility(
+                    visible: cartController.cartItems.isNotEmpty,
+                    child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle
                         ),
-                      )),
-                );
-              })
-            ],
+                        child: Text(
+                          (cartController.cartItems.length).toString(),
+                          style: TextStyle(color: Colors.white,
+                              fontSize: cartController.cartItems.length > 9
+                                  ? 10
+                                  : 14
+                          ),
+                        )),
+                  );
+                })
+              ],
+            ),
           ),
         ],
       ),
       body: Obx(() {
         final product = controller.productData.value;
-        // if (product.id == null) return const Center(child: CircularProgressIndicator());
+        if (!controller.isLoading.value && product.id == null) return const Center(child: Text("No domain found"));
 
         return Skeletonizer(
           // enabled: true,
-          enabled: product.id == null,
+          enabled: controller.isLoading.value,
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -95,7 +104,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             Container(
                                 padding: const EdgeInsets.symmetric(vertical: 4,horizontal: 8),
                                 decoration: BoxDecoration(
-                                    color: Colors.blue,
+                                    color:AppColors.primary,
                                     borderRadius: BorderRadius.circular(16)
                                 ),
                                 child: Text('${product.category}'.toUpperCase(),
@@ -108,7 +117,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 controller.isFavorite.value
                                     ? Icons.favorite
                                     : Icons.favorite_border,
-                                color: controller.isFavorite.value ? Colors.red : Colors.black,
+                                color: controller.isFavorite.value ? Colors.red : null,
                               ),
                               onPressed: controller.toggleFavorite,
                             )),
@@ -146,7 +155,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       children: [
                         const SizedBox(height: 8),
                         Text('\$${product.price?.toStringAsFixed(2) ?? ''}',
-                            style: const TextStyle(fontSize: 20, color: Colors.blue)),
+                            style: const TextStyle(fontSize: 20, color: AppColors.primary,)),
                         if (product.discountPercentage != null)
                           Text('${product.discountPercentage}% OFF',
                               style: const TextStyle(fontSize: 16, color: Colors.red)),
@@ -165,8 +174,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 const SizedBox(height: 32),
                 const Text("Reviews", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 ...?product.reviews?.map((review) => ListTile(
-                  subtitle: Text(review.reviewerName, style: const TextStyle(color: Colors.blue,fontSize: 14),),
-                  title: Text(review.comment, style: const TextStyle(color: Colors.black,fontSize: 16),),
+                  subtitle: Text(review.reviewerName, style: const TextStyle(
+                      color: AppColors.primary, fontSize: 14),),
+                  title: Text(review.comment, style:  TextStyle(fontSize: 16),),
                   trailing: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -183,6 +193,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ],
                   ),
                 )),
+                const SizedBox(height: 20),
+
+                ElevatedButton(
+                  onPressed: () => showRatingBottomSheet(context),
+                  child: const Text('Rate Now'),
+                ),
                 const SizedBox(height: 50),
               ],
             ),
@@ -196,7 +212,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     return Obx(() {
       var cartItem = cartController.cartItems
           .firstWhereOrNull((e) => e.id == product.id) ??
-          CartItem(id: product.id ?? 0, title: product.title ?? "", price: product.price ?? 0, quantity: 0);
+          CartItem(id: product.id ?? 0, title: product.title ?? "",
+              thumbnail: product.thumbnail ?? "", price: product.price ?? 0, quantity: 0);
 
       return AnimatedCrossFade(
         duration: const Duration(milliseconds: 300),
@@ -209,7 +226,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.blue, width: 1.5),
+              border: Border.all(color: AppColors.primary, width: 1.5),
               borderRadius: BorderRadius.circular(30),
             ),
             child: const Row(
@@ -217,10 +234,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               children: [
                 SizedBox(width: 5,),
                 Text("Add to Cart", style: TextStyle(fontSize: 14,
-                    color: Colors.blue,
+                    color: AppColors.primary,
                     fontWeight: FontWeight.bold)),
                 SizedBox(width: 5,),
-                Icon(Icons.add, color:Colors.blue,size: 18,),
+                Icon(Icons.add, color:AppColors.primary, size: 18,),
                 SizedBox(width: 1,),
               ],
             ),

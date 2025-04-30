@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:label="product_catelog_app"
+        android:label="Product Catelog"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

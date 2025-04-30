@@ -1,7 +1,6 @@
-// lib/data/product_cache.dart
 
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:product_catelog_app/data/product.dart'; // Your Product model
+import 'package:product_catelog_app/domain/product.dart';
 
 class ProductCache {
   static const String _boxName = 'productBox';
@@ -27,4 +26,15 @@ class ProductCache {
     final box = await Hive.openBox<Product>(_boxName);
     return box.values.toList();
   }
+
+
+  // Get a product detail by matching the product.id field
+  static Future<Product?> getStoredProduct(int id) async {
+    final box = await Hive.openBox<Product>(_boxName);
+    return box.values.firstWhere(
+          (product) => product.id == id,
+      orElse: () => Product(),
+    );
+  }
+
 }

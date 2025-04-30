@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:product_catelog_app/controller/product_detail_controller.dart';
-import 'package:product_catelog_app/data/product_detail.dart';
-import 'package:product_catelog_app/screens/product_deatil_screen.dart';
+import 'package:product_catelog_app/core/theme/app_color.dart';
+import 'package:product_catelog_app/core/utils/common_exports.dart';
+import 'package:product_catelog_app/screens/product_detail/product_deatil_screen.dart';
+import 'package:product_catelog_app/widgets/cache_network_image.dart';
 
 class FavoritePage extends StatefulWidget {
   @override
@@ -37,25 +39,23 @@ class _FavoritePageState extends State<FavoritePage> {
           return  GestureDetector(
             onTap: (){
               Get.to(ProductDetailPage(productId: product.id ?? 0));
+              // buildGetPage(ProductDetailPage(productId: product.id ?? 0));
             },
             child: ListTile(
               leading: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  product.thumbnail ?? "",
+                child: buildNetworkImage(
                   width: 70,
                   height: 70,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image, size: 70),
-                ),
+                  imageUrl: product.thumbnail ?? "",),
               ),
               title: Text(product.title ?? ''),
               subtitle: Row(
                 children: [
                   Text(
                     '\$${product.price}',
-                    style: const TextStyle(fontSize: 16, color: Colors.blue),
+                    style: const TextStyle(fontSize: 16,
+                        color: AppColors.primary,),
                   ),
                   const SizedBox(width: 16),
                   Row(

@@ -46,6 +46,8 @@ dependencies:
   carousel_slider:
   timeago:
   cached_network_image:
+  flutter_staggered_animations:
+  toast:
 
 dev_dependencies:
   hive_generator: ^2.0.0

@@ -1,17 +1,14 @@
 import 'dart:async';
-import 'dart:developer';
-import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import 'package:product_catelog_app/core/debounser.dart';
-import 'package:product_catelog_app/data/cart_item.dart';
-import 'package:product_catelog_app/data/product.dart';
+import 'package:product_catelog_app/core/utils/debounser.dart';
 import 'package:product_catelog_app/data/product_cache.dart';
+import 'package:product_catelog_app/domain/product.dart';
 import 'package:product_catelog_app/services/api_services.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart'; // Import the cache class
 
 class ProductController extends GetxController {
   var products = <Product>[].obs;
-  var isLoading = false.obs;
+
   var hasMore = true.obs;
   var isError = false.obs;
 
@@ -20,15 +17,8 @@ class ProductController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    refreshController = RefreshController(initialRefresh: false);
-    fetchProducts();  // Call fetch method
+   // Call fetch method
   }
-
-
-  // getImage() async {
-  //   productImage?.value = await _fetchImageAsBytes();
-  // }
-
 
   // int skip = 0; // Pagination skip
   final int limit = 15; // Limit per request
@@ -49,18 +39,27 @@ class ProductController extends GetxController {
     });
   }
 
-  // Fetch products from API or local storage
+  var isLoading = false.obs;
+  var isInitLoading = true.obs;
+
+  refreshData(){
+    isInitLoading.value = true;
+    products.value = List.generate(10, (i)=> Product( thumbnail: "xzdsdsdsdsdasdsdsad",
+        title: "sfsfdfsfffdsfsfdsf"));
+  }
+
   Future<void> fetchProducts({bool isRefresh = false, search = false}) async {
-    print("response.data");
-    if(isLoading.value) return;
+    if (isLoading.value) return;
     isLoading.value = true;
 
+    if(isRefresh) refreshData();
     String url = "/products";
-    Map<String,dynamic> params = {
+    Map<String, dynamic> params = {
       'limit': limit,
       'skip': currentPage.value,
     };
-    if(search){
+
+    if (search) {
       url = "/products/search";
       params = {
         'q': query,
@@ -68,25 +67,16 @@ class ProductController extends GetxController {
     }
 
     try {
+      final response = await ApiService.get(url, params: params);
 
-      final response = await ApiService.get(
-          url,
-          params: params
-      );
-
-      print("response.data");
-      print(response.data['products']);
-      // print(response.data['products']);
-      // Parse the response
       if (response.statusCode == 200) {
-
         final List<dynamic> productData = response.data['products'];
         final List<Product> fetchedProducts = productData.map((json) => Product.fromJson(json)).toList();
 
-        // Save to local storage for offline usage
         ProductCache.storeProducts(fetchedProducts);
 
         if (isRefresh) {
+          products.clear();
           products.value = fetchedProducts;
         } else {
           products.addAll(fetchedProducts);
@@ -97,40 +87,39 @@ class ProductController extends GetxController {
         if (isRefresh) {
           refreshController.refreshCompleted();
         } else {
-          if (hasMore.value) {
-            refreshController.loadComplete();
-          } else {
-            refreshController.loadNoData();
-          }
+          hasMore.value ? refreshController.loadComplete() : refreshController.loadNoData();
         }
-
       } else {
-        // Handle error
         isError(true);
       }
     } catch (e) {
-      print("response.data");
-      print(e.toString());
-      // If no internet, show data from local storage
+      print("Error: $e");
+
       final storedProducts = await ProductCache.getStoredProducts();
       if (storedProducts.isNotEmpty) {
-        products.value = storedProducts;
+        if(search){
+          products.clear();
+          products.value = storedProducts.where(
+                (product) => product.title?.toLowerCase().contains(query.toLowerCase()) ?? false,
+          ).toList();
+        }else{
+          products.value = storedProducts;
+        }
+
       } else {
+        products.clear();
         isError(true);
+        // showToast("Failed to load products. Please check your connection.");
       }
 
       if (isRefresh) {
-        refreshController.refreshFailed();
+        refreshController.refreshCompleted();
       } else {
-        refreshController.loadFailed();
+        refreshController.loadComplete();
       }
     } finally {
       isLoading(false);
+      isInitLoading(false);
     }
   }
-
-
-
-
-
 }

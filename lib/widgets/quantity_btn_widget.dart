@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:product_catelog_app/core/theme/app_color.dart';
 
 class QuantityButton extends StatelessWidget {
   final int quantity;
@@ -17,7 +18,7 @@ class QuantityButton extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.blue, width: 1.5),
+        border: Border.all(color: AppColors.primary, width: 1.5),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
@@ -25,7 +26,8 @@ class QuantityButton extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: onRemove,
-            child: const Icon(Icons.remove, size: 18, color: Colors.blue),
+            child: const Icon(Icons.remove, size: 18,
+                color: AppColors.primary,),
           ),
           _verticalDivider(),
           Text(
@@ -33,13 +35,14 @@ class QuantityButton extends StatelessWidget {
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.blue,
+              color: AppColors.primary,
             ),
           ),
           _verticalDivider(),
           GestureDetector(
             onTap: onAdd,
-            child: const Icon(Icons.add, size: 18, color: Colors.blue),
+            child: const Icon(Icons.add, size: 18,
+                color: AppColors.primary,),
           ),
         ],
       ),
@@ -54,7 +57,7 @@ class QuantityButton extends StatelessWidget {
       decoration: const BoxDecoration(
         border: Border(
           right: BorderSide(
-            color: Colors.blue,
+            color: AppColors.primary,
             width: 1,
             style: BorderStyle.solid, // for solid line
             // you can simulate dotted if needed separately

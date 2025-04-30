@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:product_catelog_app/data/product_detail.dart';
-import 'package:product_catelog_app/data/product_detail_cache.dart';
-import 'package:product_catelog_app/services/api_services.dart';
+import 'package:product_catelog_app/core/utils/common_exports.dart';
 
 class ProductDetailController extends GetxController {
   Rx<ProductDetail> productData = ProductDetail().obs;
@@ -40,9 +37,9 @@ class ProductDetailController extends GetxController {
           params: params
       );
 
-      print("response.data");
+      print("response.domain");
       print(response.data['products']);
-      // print(response.data['products']);
+      // print(response.domain['products']);
       // Parse the response
       if (response.statusCode == 200) {
 
@@ -59,12 +56,23 @@ class ProductDetailController extends GetxController {
     } catch (e) {
 
       final storedProducts = await ProductDetailCache.getProductDetail(id);
+      print("storedProducts?.id");
+      print(storedProducts?.id);
       if (storedProducts?.id != null) {
 
         productData.value = storedProducts ?? ProductDetail();
         setProduct(productData.value);
+        isLoading(false);
       } else {
-        isError(true);
+        final storedProducts = await ProductCache.getStoredProduct(id);
+        if (storedProducts?.id != null) {
+          productData.value = ProductDetail.fromJson(storedProducts!.toJson());
+          productData.value.images = [storedProducts.thumbnail ?? ""];
+          productData.refresh();
+        }else{
+          isError(true);
+        }
+
       }
     } finally {
       isLoading(false);
